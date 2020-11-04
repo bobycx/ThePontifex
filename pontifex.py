@@ -57,8 +57,8 @@ class Pontifex():
     def listener_daemon(self):
         while 1:
             dmos = self.c2.accept_conn()
-            for d in self.dmoss:
-                if self.dmoss[d].md5_hash == dmos.md5_hash:
+            for d in self.dmoss.keys():
+                if d == dmos.md5_hash:
                     self.isConnected = True
                     dmos.conn.send("free".encode())
             if self.isConnected != True:

