@@ -19,3 +19,9 @@ class Debug():
     def eprint(*objs):
         prefix = "[⚠]"
         Debug._print("{}{}{} {}{}\n".format(Style.BRIGHT, Fore.RED, prefix, *objs, Style.RESET_ALL))
+        
+    @staticmethod
+    def sprint(*objs, ANODE, APORT, thread=False):
+        prefix = Style.DIM + Fore.YELLOW + "[{0}] ".format(str(datetime.now().time())[:8]) + Style.RESET_ALL + Fore.YELLOW + f" <tcp://{ANODE}:{APORT}>"
+        __ = lambda _: "\n" if _==1 else ""
+        Debug._print(__(thread) + prefix + Style.RESET_ALL + " {}{}\n".format(Fore.BLUE, *objs))

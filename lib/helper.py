@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 from lib.debug import Debug
 
+# TODO: fix time formatting
 def ctime():
     dtCurrentTime = datetime.now()
     return str(dtCurrentTime).replace('-', '/') + str(dtCurrentTime.time())[:8]
