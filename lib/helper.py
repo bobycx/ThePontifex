@@ -1,12 +1,27 @@
-import sys
-import os
+import sys, os
 from datetime import datetime
 from lib.debug import Debug
+from prompt_toolkit.styles import Style
 
-# TODO: fix time formatting
-def ctime():
+prompt_style = Style.from_dict({
+    'completion-menu.completion': 'bg:#008888 #ffffff',
+    'completion-menu.completion.current': 'bg:#00aaaa #000000',
+    'scrollbar.background': 'bg:#88aaaa',
+    'scrollbar.button': 'bg:#222222',
+    'prompt': '#00FFFF bold',
+    'prompt.arg.text': '#00aaaa',
+})
+
+WINDOWS = sys.platform.startswith('win')
+
+CMD_CLEAR = "cls" if WINDOWS else "clear"
+
+def ctime(file=False):
     dtCurrentTime = datetime.now()
-    return str(dtCurrentTime).replace('-', '/') + str(dtCurrentTime.time())[:8]
+    if file == False:
+        return dtCurrentTime.strftime("%Y/%m/%d %H:%M:%S")
+    else:
+        return dtCurrentTime.strftime("%Y-%m-%d at %H.%M.%S")
 
 def clean(s):
     s.close()
@@ -34,7 +49,7 @@ def banner():
                  |          [   {2}The Pontifex version 0.1.3{1}                                                                ]
                 / \    *    [   {0}Disclaimer{1}: this project has no religious intent, if you know the reference, you know ;)  ]
                 | |         [   {0}Creator{1}: Kryptosr                                                                         ]
-        *      //_\\        [   {0}Hobby{1}: Making secc width doritos
+        *      //_\\        [   {0}Hobby{1}: Making secc width doritos                                                          ]
               //(_)\\
                |/^\|      *
             *  ||_||
@@ -49,6 +64,6 @@ def banner():
         *   | |  |  | |
             | | -|- | |        *
             |_|__|__|_|
-*          /`  =======  `\
+*          /`  =======`\
         /`    =======    `\
                 """.format('\033[31m', '\033[00m', '\033[93m'))
