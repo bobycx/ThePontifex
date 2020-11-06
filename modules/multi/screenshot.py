@@ -1,5 +1,6 @@
 from lib.debug import Debug
-import subprocess, os
+from lib.helper import ctime
+import os
 
 class module():
     def __init__(self):
@@ -11,7 +12,7 @@ class module():
     def _exec(self, dmos, args):
         dmos.conn.send(self.Command.encode())
         # TODO: just fix this shit to be multi plat
-        DATE = subprocess.check_output("date", shell=True).rstrip(b'\n').decode("utf-8") + ".png"
+        DATE = "sc_" + ctime(file=True) + ".png"
         lootFolder = "./loot/screenshots/"
         path = os.path.join(lootFolder, DATE)
 
