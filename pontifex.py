@@ -3,7 +3,7 @@
 ###############################################################
 ##   pontifex.py                                             ##
 ##   The Pontifex                                            ##
-##   Created by Bob Yuan on 2020-11-03.                      ##
+##   Created by Kryptosr on 2020-11-03.                      ##
 ##   Copyright © 2020 Kryptosr. All rights reserved.         ##
 ###############################################################
 
@@ -11,14 +11,15 @@ import socket
 import sys, os, threading, time
 from hashlib import md5
 import json
-from prompt_toolkit.history import FileHistory
-from prompt_toolkit import prompt
-from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from prettytable import PrettyTable
+from termcolor import colored, cprint
 from lib.helper import *
 from lib.debug import Debug
 from lib.c2 import C2
 from lib.dmos import Dmos
-from termcolor import colored, cprint
+from pygments.lexers.html import HtmlLexer
+from prompt_toolkit.shortcuts import prompt
+from prompt_toolkit.lexers import PygmentsLexer
 
 class Pontifex():
     def __init__(self):
@@ -30,7 +31,7 @@ class Pontifex():
 
     def cmdline(self):
         while 1:
-            cmd = input(colored("[Pontifex] → ", 'cyan', attrs=['bold']))
+            cmd = prompt("[Pontifex] → ", style=prompt_style)
             command = cmd.split(' ')[0]
             args = cmd[len(command)+1:]
 
@@ -44,10 +45,14 @@ class Pontifex():
                 self.dmoss[args].conn.send("free".encode())
                 terminate(self.dmoss[args].conn, self.dmoss, self.dmoss[args], "gracefully")
             elif command == "list":
-                #print(self.dmoss)
-                #print("BORN  HASH\tIP (global)\tHOSTNAME")
-                for d, hash in enumerate(self.dmoss):
-                    print("{}\t{}\t{}\t\t{}".format(self.dmoss[hash].born, hash, self.dmoss[hash].GLOBAL, self.dmoss[hash].HOSTNAME))
+                if not self.dmoss:
+                    Debug.eprint("There are no slaves online")
+                else:
+                    t = PrettyTable()
+                    t.field_names = ["BORN", "HASH", "GLOBAL IP", "HOSTNAME"]
+                    for d, hash in enumerate(self.dmoss):
+                        t.add_row([self.dmoss[hash].born, hash, self.dmoss[hash].GLOBAL, self.dmoss[hash].HOSTNAME])
+                    print(t)
             elif command == "i":
                 try:
                     self.dmoss[args].interact()
@@ -90,7 +95,7 @@ class Pontifex():
         KEEPALIVE.start()
 
 if __name__ == "__main__":
-    os.system("clear")
+    os.system(CMD_CLEAR)
     banner()
     p = Pontifex()
     p.start_c2()

