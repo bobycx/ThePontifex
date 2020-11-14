@@ -1,0 +1,5 @@
+tqdm
+prompt_toolkit
+termcolor
+colorama
+prettytable
