@@ -7,12 +7,8 @@
 ##   Copyright © 2020 Kryptosr. All rights reserved.         ##
 ###############################################################
 
-import socket
-import sys, os, threading, time
-from hashlib import md5
-import json
+import sys, os, threading, time, socket
 from prettytable import PrettyTable
-from termcolor import colored, cprint
 from lib.helper import *
 from lib.debug import Debug
 from lib.c2 import C2
@@ -50,7 +46,7 @@ class Pontifex():
                 else:
                     t = PrettyTable()
                     t.field_names = ["BORN", "HASH", "GLOBAL IP", "HOSTNAME"]
-                    for d, hash in enumerate(self.dmoss):
+                    for _, hash in enumerate(self.dmoss):
                         t.add_row([self.dmoss[hash].born, hash, self.dmoss[hash].GLOBAL, self.dmoss[hash].HOSTNAME])
                     print(t)
             elif command == "i":
@@ -95,8 +91,8 @@ class Pontifex():
         self.listener = threading.Thread(target=self.listener_daemon)
         #LISTENER.daemon = True
         try:
-            self.listener.start()
             self.active = True
+            self.listener.start()
             Debug.tprint(f"TCP server <tcp://{self.ANODE}:{self.APORT}> is online")
         except Exception as e:
             Debug.eprint(f"Unable to start daemon listener, Error: {e}")
