@@ -1,9 +1,10 @@
-import sys, os, traceback
-import pyfiglet
+import sys, os, traceback, readline
 from datetime import datetime
 from termcolor import colored
 from lib.debug import Debug
 from prompt_toolkit.styles import Style
+
+#__all__ = []
 
 prompt_style = Style.from_dict({
     'completion-menu.completion': 'bg:#008888 #ffffff',
@@ -29,7 +30,7 @@ def ctime(file=False):
 def clean(s):
     s.close()
 
-def _input():
+def prompt_input(*objs, commands):
     pass
 
 def safe_exec(func):
@@ -48,10 +49,23 @@ def terminate(dmoss, dmos, signal=None):
     if signal == signals[0]:
         Debug.tprint("Connection with dmos {} terminated by the Pontifex".format(dmos.md5_hash))
     elif signal == signals[1]:
-        Debug.tprint("Connection with dmos {} has been broken".format(dmos.md5_hash))
+        Debug.tprint("Connection with dmos {} has been broken".format(dmos.md5_hash), thread=True)
 
 def banner():
+    print(r"""
+ _______ _           ______                 _    ___
+(_______) |         (_____ \            _  (_)  / __)
+    _   | |__  _____ _____) )__  ____ _| |_ _ _| |__ _____ _   _
+   | |  |  _ \| ___ |  ____/ _ \|  _ (_   _) (_   __) ___ ( \ / )
+   | |  | | | | ____| |   | |_| | | | || |_| | | |  | ____|) X (
+   |_|  |_| |_|_____)_|    \___/|_| |_| \__)_| |_|  |_____|_/ \_) {}v1.0 
 
+             λ Multiplatform RAT created by {}@kryptosr {}λ
+    
+    """.format("\033[1m", "\033[31m", "\033[37m"))
+
+def banner_old():
+    
     print(r"""
                 _|_             Welcome to the Cathedral
                  |          [   {2}The Pontifex version 0.1.3{1}                                                                ]
@@ -75,3 +89,4 @@ def banner():
 *          /`  =======`\
         /`    =======    `\
                 """.format('\033[31m', '\033[00m', '\033[93m'))
+    
