@@ -16,24 +16,25 @@ class module():
         time.sleep(1)
         _, imageName = os.path.split(image_path)
         cmdstr = os.path.getsize(image_path)
-        data = {
+        args = {
             "size": cmdstr,
             "name": imageName
         }
-        dmos.send_packet(data, is_json=True)
-        progress = tqdm.tqdm(range(os.path.getsize(image_path)), f"Sending {image_path}", unit="B", unit_scale=True, unit_divisor=1024)
+        dmos.send_packet(args, is_json=True)
+        progress = tqdm.tqdm(range(cmdstr), f"Sending {image_path}", unit="B", unit_scale=True, unit_divisor=1024)
         with open(image_path, 'rb') as f:
-            for _ in progress:
-                data = f.read(1024)
+            while data := f.read(1024):
                 if not data:
                     break
                 dmos.conn.send(data)
                 progress.update(len(data))
+
                 #progress.update(len(data))
+        progress.close()
         f.close()
         Debug.tprint(f"Image {image_path} ({cmdstr}) sent to DMOS {dmos.md5_hash}")
         status_code = dmos.conn.recv(64).decode()
         if SUCCESS_CODE in status_code:
-            Debug.tprint(f"Background image of DMOS {dmos.md5_hash} change to {image_path}")
+            Debug.tprint(f"Background image of DMOS {dmos.md5_hash} changed to {image_path}")
         else:
             Debug.tprint("something went wrong...")
