@@ -1,4 +1,4 @@
-import sys, os, threading, time, subprocess, json
+import sys, os, threading, time, subprocess, json, readline
 from hashlib import md5
 from lib.helper import *
 from lib.debug import Debug
@@ -25,8 +25,10 @@ class Dmos:
 
     def interact(self):
         modules_multi = self.c2.modules_multi
+        cmdList = ["free", "sysinfo", "fat", "clear", "b"] + modules_multi.keys()
+        readline.set_completer(TabCompleter(cmdList).complete)
         while 1:
-            command = prompt(f"[{self.USERNAME}@{self.GLOBAL}]>> ", style=prompt_style)
+            command = prompt_input(f"[{self.USERNAME}@{self.GLOBAL}]>> ")
             cmd = command.split(' ')[0]
             args = command[len(cmd)+1:]
 
@@ -42,17 +44,27 @@ class Dmos:
                 self.system_info()
             elif command == "fat":
                 self.conn.send(command.encode())
-                self.conn.send("yomama".encode())
-                self.conn.send("fat".encode())
             elif command == "clear":
                 os.system("clear")
             elif command == "b":
                 self.c2.multi_handler.cmdline()
-                pass
 
-    def send_packet(self, content, is_json=False):
-        if is_json : data = json.dumps(content) 
-        self.conn.send(data.encode())
+    def wrap_send(self, content, is_json=False):
+        if is_json : data = json.dumps(content)
+        try: 
+            self.conn.send(data.encode())
+        except:
+            Debug.eprint("An unexpected error ocurred")
+    def wrap_recieve(self):
+        recv_data = ""
+        while 1:
+            try:
+                recv_data += self.conn.recv(1024).decode()
+                return recv_data
+            except ValueError:
+                continue
+            else:
+                Debug.eprint("An unexpected error ocurred")
 
     def free_dmos(self):
         self.conn.send("free".encode())

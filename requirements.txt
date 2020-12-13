@@ -1,5 +1,6 @@
 tqdm
+argparse
 prompt_toolkit
 termcolor
-colorama
 prettytable
+sqlite3

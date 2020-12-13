@@ -2,36 +2,33 @@ import sys, os, traceback, readline
 from datetime import datetime
 from termcolor import colored
 from lib.debug import Debug
-from prompt_toolkit.styles import Style
 
 #__all__ = []
-
-prompt_style = Style.from_dict({
-    'completion-menu.completion': 'bg:#008888 #ffffff',
-    'completion-menu.completion.current': 'bg:#00aaaa #000000',
-    'scrollbar.background': 'bg:#88aaaa',
-    'scrollbar.button': 'bg:#222222',
-    'prompt': '#00FFFF bold',
-    'prompt.arg.text': '#00aaaa',
-})
 
 SUCCESS_CODE    = "SUCCESS"
 ERROR_CODE      = "ERROR"
 WINDOWS         = sys.platform.startswith('win')
 CMD_CLEAR       = "cls" if WINDOWS else "clear"
 
+RED             = '\x1b[38;2;255;0;0m'
+CYAN            = '\x1b[38;2;0;255;251m'
+GREEN           = '\x1b[38;2;0;255;0m'
+BLUE            = '\x1b[38;2;36;114;200m'
+YELLOW_DIM      = '\x1b[38;2;220;220;220m'
+RESET           = '\x1b[0m'
+
 def ctime(file=False):
     dtCurrentTime = datetime.now()
     if file == False:
-        return colored(dtCurrentTime.strftime("%Y/%m/%d %H:%M:%S"), 'yellow')
+        return YELLOW_DIM + dtCurrentTime.strftime("%Y/%m/%d %H:%M:%S")
     else:
-        return colored(dtCurrentTime.strftime("%Y-%m-%d at %H.%M.%S"), 'yellow')
+        return YELLOW_DIM + dtCurrentTime.strftime("%Y-%m-%d at %H.%M.%S")
 
 def clean(s):
     s.close()
 
-def prompt_input(*objs, commands):
-    pass
+def prompt_input(*objs):
+    return input("{}{}{}".format(CYAN, *objs, RESET)).rstrip(' ')
 
 def safe_exec(func):
     def inner_function(*args, **kwargs):
@@ -89,4 +86,11 @@ def banner_old():
 *          /`  =======`\
         /`    =======    `\
                 """.format('\033[31m', '\033[00m', '\033[93m'))
-    
+
+class TabCompleter:
+    def __init__(self, cmdList):
+        self.cmdList = cmdList
+
+    def complete(self, text, state):
+        results =  [x+" " for x in self.cmdList if x.startswith(text)] + [None]
+        return results[state]

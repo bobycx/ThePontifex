@@ -1,11 +1,19 @@
 from __future__ import print_function
-import sys, argparse
+import sys, argparse, readline
 
 if not (sys.version_info.major == 3 and sys.version_info.minor >= 8):
     print("This tool requires python 3.8 or above.")
     sys.exit(0)
 
-from lib.server_interactive import Pontifex
+from lib.control import Control
+
+def configure_tab_completion():
+    if sys.platform == 'darwin':
+        readline.parse_and_bind("bind -e")
+        readline.parse_and_bind("bind '\t' rl_complete")
+    else:
+        readline.parse_and_bind('tab: complete')
+        readline.set_completer_delims(' \t\n`~!@#$%^&*()-=+[{]}\\|;:\'",<>?')
 
 def arguement_parser():
     parser = argparse.ArgumentParser()
@@ -15,11 +23,12 @@ def arguement_parser():
     return parser.parse_args()
 
 def pontifex(argslist):
-    ptfx = Pontifex(argslist.LHOST, argslist.LPORT)
-    ptfx.start_multi_handler()
+    ptfx_control = Control(argslist.LHOST, argslist.LPORT)
+    ptfx_control.start_multi_handler()
 
 if __name__ == "__main__":
     try:
+        configure_tab_completion()
         pontifex(arguement_parser())
     except (KeyboardInterrupt, SystemExit):
         pass

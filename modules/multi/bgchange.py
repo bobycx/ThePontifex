@@ -20,11 +20,12 @@ class module():
             "size": cmdstr,
             "name": imageName
         }
-        dmos.send_packet(args, is_json=True)
+        dmos.wrap_send(args, is_json=True)
         progress = tqdm.tqdm(range(cmdstr), f"Sending {image_path}", unit="B", unit_scale=True, unit_divisor=1024)
         with open(image_path, 'rb') as f:
             while data := f.read(1024):
                 if not data:
+
                     break
                 dmos.conn.send(data)
                 progress.update(len(data))

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 ###############################################################
-##   pontifex.py                                             ##
+##   control.py                                              ##
 ##   The Pontifex                                            ##
 ##   Created by Kryptosr on 2020-11-03.                      ##
 ##   Copyright © 2020 Kryptosr. All rights reserved.         ##
 ###############################################################
 
-import sys, os, threading, time, socket
+import sys, os, threading, time, socket, readline
 from prettytable import PrettyTable
 from lib.helper import *
 from lib.debug import Debug
@@ -15,7 +15,7 @@ from lib.c2 import C2
 from lib.dmos import Dmos
 from prompt_toolkit.shortcuts import prompt
 
-class Pontifex():
+class Control():
     def __init__(self, ANODE, APORT):
         self.ANODE = ANODE
         self.APORT = APORT
@@ -26,8 +26,10 @@ class Pontifex():
         self.listener = None
 
     def cmdline(self):
+        cmdList = ["exit", "clear", "list", "i", "r"]
+        readline.set_completer(TabCompleter(cmdList).complete)
         while 1:
-            cmd = prompt("[Pontifex] → ", style=prompt_style)
+            cmd = prompt_input("[Pontifex] → ")
             command = cmd.split(' ')[0]
             args = cmd[len(command)+1:]
 
