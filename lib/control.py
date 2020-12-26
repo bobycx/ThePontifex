@@ -11,16 +11,15 @@ import sys, os, threading, time, socket, readline
 from prettytable import PrettyTable
 from lib.helper import *
 from lib.debug import Debug
-from lib.c2 import C2
+from lib.server import TCPServer
 from lib.dmos import Dmos
-from prompt_toolkit.shortcuts import prompt
 
 class Control():
     def __init__(self, ANODE, APORT):
         self.ANODE = ANODE
         self.APORT = APORT
         self.dmoss = {}
-        self.c2 = C2(self.ANODE, self.APORT, self)
+        self.c2 = TCPServer(self.ANODE, self.APORT, self)
         self.isConnected = False
         self.active = False
         self.listener = None
@@ -29,7 +28,7 @@ class Control():
         cmdList = ["exit", "clear", "list", "i", "r"]
         readline.set_completer(TabCompleter(cmdList).complete)
         while 1:
-            cmd = prompt_input("[Pontifex] → ")
+            cmd = Debug.prompt_input("[Pontifex] → ")
             command = cmd.split(' ')[0]
             args = cmd[len(command)+1:]
 
@@ -67,8 +66,12 @@ class Control():
         self.disconnect_all()
         self.active = False
         if self.listener:
-            socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((self.c2.ANODE,self.c2.APORT))
-            self.listener.join()
+            # TODO: fix windows error
+            try:
+                socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((self.c2.ANODE,self.c2.APORT))
+                self.listener.join()
+            except:
+                pass
         time.sleep(0.5)
         os._exit(1)
 

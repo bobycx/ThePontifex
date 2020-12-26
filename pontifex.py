@@ -1,5 +1,11 @@
 from __future__ import print_function
-import sys, argparse, readline
+import sys, argparse
+
+## windows readline support 
+try:
+  import readline
+except ImportError:
+  import pyreadline as readline
 
 if not (sys.version_info.major == 3 and sys.version_info.minor >= 8):
     print("This tool requires python 3.8 or above.")

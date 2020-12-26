@@ -3,4 +3,5 @@ argparse
 prompt_toolkit
 termcolor
 prettytable
-sqlite3
+pyreadline
+colorama

@@ -1,7 +1,7 @@
 import sys, os, traceback, readline
+import lib.debug
 from datetime import datetime
 from termcolor import colored
-from lib.debug import Debug
 
 #__all__ = []
 
@@ -9,13 +9,6 @@ SUCCESS_CODE    = "SUCCESS"
 ERROR_CODE      = "ERROR"
 WINDOWS         = sys.platform.startswith('win')
 CMD_CLEAR       = "cls" if WINDOWS else "clear"
-
-RED             = '\x1b[38;2;255;0;0m'
-CYAN            = '\x1b[38;2;0;255;251m'
-GREEN           = '\x1b[38;2;0;255;0m'
-BLUE            = '\x1b[38;2;36;114;200m'
-YELLOW_DIM      = '\x1b[38;2;220;220;220m'
-RESET           = '\x1b[0m'
 
 def ctime(file=False):
     dtCurrentTime = datetime.now()
@@ -26,9 +19,6 @@ def ctime(file=False):
 
 def clean(s):
     s.close()
-
-def prompt_input(*objs):
-    return input("{}{}{}".format(CYAN, *objs, RESET)).rstrip(' ')
 
 def safe_exec(func):
     def inner_function(*args, **kwargs):

