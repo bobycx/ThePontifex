@@ -1,7 +1,6 @@
 import sys, os, traceback, readline
 from lib.debug import Debug, palette
 from datetime import datetime
-from termcolor import colored
 
 #__all__ = []
 
