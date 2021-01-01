@@ -1,5 +1,5 @@
 import sys, os, traceback, readline
-import lib.debug
+from lib.debug import Debug, palette
 from datetime import datetime
 from termcolor import colored
 
@@ -13,9 +13,9 @@ CMD_CLEAR       = "cls" if WINDOWS else "clear"
 def ctime(file=False):
     dtCurrentTime = datetime.now()
     if file == False:
-        return YELLOW_DIM + dtCurrentTime.strftime("%Y/%m/%d %H:%M:%S")
+        return palette.YELLOW_DIM + dtCurrentTime.strftime("%Y/%m/%d %H:%M:%S")
     else:
-        return YELLOW_DIM + dtCurrentTime.strftime("%Y-%m-%d at %H.%M.%S")
+        return palette.YELLOW_DIM + dtCurrentTime.strftime("%Y-%m-%d at %H.%M.%S")
 
 def clean(s):
     s.close()

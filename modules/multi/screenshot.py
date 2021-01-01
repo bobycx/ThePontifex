@@ -11,7 +11,6 @@ class module():
 
     def _exec(self, dmos, args):
         dmos.conn.send(self.Command.encode())
-        # TODO: just fix this shit to be multi plat
         DATE = "sc_" + ctime(file=True) + ".png"
         lootFolder = "./loot/screenshots/"
         path = os.path.join(lootFolder, DATE)

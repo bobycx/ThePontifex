@@ -11,6 +11,10 @@ class module():
 
     def _exec(self, dmos, args):
         dmos.conn.send(self.Command.encode())
-        token = dmos.conn.recv(1024)
-        Debug.tprint(f"Recieved extracted token: {token}")
+        tokens = []
+        while b'FIN' not in (d := dmos.conn.recv(1024)): #FIN
+            tokens.append(d)
+        Debug.tprint("Recieved extracted tokens:")
+        for token in tokens:
+            print(token)
 

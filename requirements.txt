@@ -1,7 +1,4 @@
-tqdm
-argparse
-prompt_toolkit
-termcolor
-prettytable
-pyreadline
-colorama
+prettytable==2.0.0
+pyreadline==2.1      
+tqdm==4.54.1
+wcwidth==0.2.5
