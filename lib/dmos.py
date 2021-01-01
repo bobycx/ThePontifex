@@ -59,8 +59,11 @@ class Dmos:
             'EOF': [INT]
         }
         """
-        
-        content['EOF'] = binascii.b2a_hex(os.urandom(8)) if content[EOF] != None else does_recieve = False
+        if content[EOF] != None:
+            content['EOF'] = binascii.b2a_hex(os.urandom(8))
+        else:
+            does_recieve = False
+            
         data = json.dumps(content)
         try: 
             self.conn.send(data.encode())
@@ -72,7 +75,7 @@ class Dmos:
     def socket_recieve(self, ID, EOF):
         _ID = json.loads(self.conn.recv(36))['ID']
         recv_data = ""
-        if _ID = ID:
+        if _ID == ID:
             while (d := self.conn.recv(1024)):
                 try:
                     if EOF not in d:

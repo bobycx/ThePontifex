@@ -58,6 +58,7 @@ class Control():
                 python = sys.executable
                 os.execl(python, python, *sys.argv)
     def disconnect_all(self):
+        print(self.dmoss)
         for dmos in self.dmoss:
             dmos.conn.send("free".encode())
 
