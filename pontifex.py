@@ -25,7 +25,7 @@ def arguement_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument("LHOST", help="Local address; type 0.0.0.0 if you're unsure.", type=str)
     parser.add_argument("LPORT", help="Local port for the Pontifex to listen on.", type=int)
-    parser.add_argument("--testing", help="Toggle testing; devs only.")
+    parser.add_argument("--travis", help="Toggle testing; devs only.")
     return parser.parse_args()
 
 def pontifex(argslist):

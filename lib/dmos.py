@@ -2,6 +2,7 @@ import sys, os, threading, time, subprocess, json, readline
 from hashlib import md5
 from lib.helper import *
 from lib.debug import Debug
+#from Protocol.Packet import Packet
 
 class Dmos:
     def __init__(self, basic, sysinfo, global_addr, conn, c2):
@@ -20,7 +21,6 @@ class Dmos:
         self.conn           = conn
         self.interactive    = False
         self.c2             = c2
-
     
     def interact(self):
         modules_multi = self.c2.modules_multi
@@ -49,47 +49,8 @@ class Dmos:
             elif command == "b":
                 self.c2.multi_handler.cmdline()
 
-    def send_command(self, content):
-        """
-        {
-            'ID': [STRING]
-            'args': {
-                ...
-            }
-            'EOF': [INT]
-        }
-        """
-        if content[EOF] != None:
-            content['EOF'] = binascii.b2a_hex(os.urandom(8))
-        else:
-            does_recieve = False
-            
-        data = json.dumps(content)
-        try: 
-            self.conn.send(data.encode())
-            if does_recieve is not False:
-                return socket_recieve(content['ID'], content['EOF'])
-        except:
-            Debug.eprint("An unexpected error ocurred")
-            
-    def socket_recieve(self, ID, EOF):
-        _ID = json.loads(self.conn.recv(36))['ID']
-        recv_data = ""
-        if _ID == ID:
-            while (d := self.conn.recv(1024)):
-                try:
-                    if EOF not in d:
-                        recv_data += d
-                    else:
-                        return recv_data   
-                except ValueError:
-                    continue
-                else:
-                    Debug.eprint("An unexpected error ocurred")
-
     def free_dmos(self):
-        _json_cmd = json.dumps({'ID': 'free', 'args': None, 'EOF': None})
-        self.send_command(_json_cmd)
+        pass
         
     def transfer(self, conn):
         """
