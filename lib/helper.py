@@ -46,7 +46,7 @@ def banner():
    | |  | | | | ____| |   | |_| | | | || |_| | | |  | ____|) X (
    |_|  |_| |_|_____)_|    \___/|_| |_| \__)_| |_|  |_____|_/ \_) {}v1.0 
 
-             λ Multiplatform RAT created by {}@kryptosr {}λ
+             λ Cross-platform RAT created by {}@kryptosr {}λ
     
     """.format("\033[1m", "\033[31m", "\033[37m"))
 

