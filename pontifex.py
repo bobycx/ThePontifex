@@ -1,25 +1,11 @@
 from __future__ import print_function
-import sys, argparse
-
-## windows readline support 
-try:
-  import readline
-except ImportError:
-  import pyreadline as readline
+import sys, argparse,  threading, time
 
 if not (sys.version_info.major == 3 and sys.version_info.minor >= 8):
     print("This tool requires python 3.8 or above.")
     sys.exit(0)
 
 from lib.control import Control
-
-def configure_tab_completion():
-    if sys.platform == 'darwin':
-        readline.parse_and_bind("bind -e")
-        readline.parse_and_bind("bind '\t' rl_complete")
-    else:
-        readline.parse_and_bind('tab: complete')
-        readline.set_completer_delims(' \t\n`~!@#$%^&*()-=+[{]}\\|;:\'",<>?')
 
 def arguement_parser():
     parser = argparse.ArgumentParser()
@@ -29,14 +15,18 @@ def arguement_parser():
     return parser.parse_args()
 
 def pontifex(argslist):
-    ptfx_control = Control(argslist.LHOST, argslist.LPORT)
-    ptfx_control.start_multi_handler()
+    try:
+        ptfx_control = Control(argslist.LHOST, argslist.LPORT)
+        ptfx_control.start_multi_handler()
+    except Exception as e:
+        print(e)
+        ptfx_control.terminate_server()
+
 
 if __name__ == "__main__":
-    try:
-        configure_tab_completion()
-        pontifex(arguement_parser())
-    except (KeyboardInterrupt, SystemExit):
-        pass
+    #configure_tab_completion()
+    pontifex(arguement_parser())
+    
+        
 
 

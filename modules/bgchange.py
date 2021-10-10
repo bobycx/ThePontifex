@@ -1,7 +1,6 @@
 from lib.debug import Debug
-from lib.helper import ctime, SUCCESS_CODE, ERROR_CODE
+from lib.helper import getTime, SUCCESS_CODE, ERROR_CODE
 import os
-import tqdm
 import time
 
 class module():

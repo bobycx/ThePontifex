@@ -1,23 +1,20 @@
-import sys, os, traceback, readline
-from lib.debug import Debug, palette
+import sys, os, traceback
+from lib.debug import Debug, log, palette
 from datetime import datetime
 
-#__all__ = []
+
 
 SUCCESS_CODE    = "SUCCESS"
 ERROR_CODE      = "ERROR"
 WINDOWS         = sys.platform.startswith('win')
 CMD_CLEAR       = "cls" if WINDOWS else "clear"
 
-def ctime(file=False):
+def getTime(file=False):
     dtCurrentTime = datetime.now()
     if file == False:
-        return palette.YELLOW_DIM + dtCurrentTime.strftime("%Y/%m/%d %H:%M:%S")
+        return dtCurrentTime.strftime("%Y/%m/%d %H:%M:%S")
     else:
-        return palette.YELLOW_DIM + dtCurrentTime.strftime("%Y-%m-%d at %H.%M.%S")
-
-def clean(s):
-    s.close()
+        return dtCurrentTime.strftime("%Y-%m-%d at %H.%M.%S")
 
 def safe_exec(func):
     def inner_function(*args, **kwargs):
@@ -28,14 +25,13 @@ def safe_exec(func):
             traceback.print_exc()
     return inner_function
 
-def terminate(dmoss, dmos, signal=None):
-    dmos.conn.close()
-    dmoss.pop(dmos.md5_hash, None)
-    signals = ["gracefully", "error"]
-    if signal == signals[0]:
-        Debug.tprint("Connection with dmos {} terminated by the Pontifex".format(dmos.md5_hash))
-    elif signal == signals[1]:
-        Debug.tprint("Connection with dmos {} has been broken".format(dmos.md5_hash), thread=True)
+def safe_socket(func):
+    def inner_function(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except ConnectionBroken:
+            raise ConnectionBroken
+    return inner_function
 
 def banner():
     print(r"""
@@ -76,10 +72,5 @@ def banner_old():
         /`    =======    `\
                 """.format('\033[31m', '\033[00m', '\033[93m'))
 
-class TabCompleter:
-    def __init__(self, cmdList):
-        self.cmdList = cmdList
-
-    def complete(self, text, state):
-        results =  [x+" " for x in self.cmdList if x.startswith(text)] + [None]
-        return results[state]
+class ConnectionBroken(Exception):
+    pass

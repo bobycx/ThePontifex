@@ -1,5 +1,5 @@
 from lib.debug import Debug
-from lib.helper import ctime
+from lib.helper import getTime
 import os
 
 class module():
@@ -11,7 +11,7 @@ class module():
 
     def _exec(self, dmos, args):
         dmos.conn.send(self.Command.encode())
-        DATE = "sc_" + ctime(file=True) + ".png"
+        DATE = "sc_" + getTime(file=True) + ".png"
         lootFolder = "./loot/screenshots/"
         path = os.path.join(lootFolder, DATE)
 

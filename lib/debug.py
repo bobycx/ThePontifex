@@ -1,5 +1,8 @@
 import builtins
-import sys
+import sys, threading, logging
+from rich.console import Console
+from rich.logging import RichHandler
+from rich.highlighter import NullHighlighter
 from datetime import datetime
 from dataclasses import dataclass
 
@@ -13,11 +16,24 @@ class Colours:
     RESET           = '\x1b[0m'
 
 palette = Colours()
+console = Console(highlight=False)
+
+logging.basicConfig(
+    level="NOTSET", format="%(message)s", datefmt="[%X]", handlers=[RichHandler(show_path=False, markup=True, highlighter=NullHighlighter())]
+)
+
+log = logging.getLogger("rich")
+
 
 class Debug():
     @staticmethod
     def prompt_input(*objs):
-        return input("{}{}{}".format(palette.CYAN, *objs, palette.RESET)).rstrip(' ')
+        return console.input("[bold magenta]{}".format(*objs))
+
+    @staticmethod
+    def lprint(*objs):
+        # loot print
+        console.print("[medium_spring_green]{}".format(*objs))
 
     @staticmethod
     def _print(text):
@@ -38,6 +54,10 @@ class Debug():
     @staticmethod
     def sprint(*objs, ANODE, APORT, thread=False):
         # server print
-        prefix = palette.YELLOW_DIM + "[{0}] ".format(str(datetime.now().time())[:8]) + palette.RESET + palette.YELLOW_DIM + f" <tcp://{ANODE}:{APORT}>"
-        __ = lambda _: "\n" if _==1 else ""
-        Debug._print(__(thread) + prefix + Colours.RESET + " {}{}\n".format(palette.BLUE, *objs))
+        #prefix = "[{0}] ".format(str(datetime.now().time())[:8]) + palette.RESET + palette.YELLOW_DIM + f" <tcp://{ANODE}:{APORT}>"
+        #__ = lambda _: "\n" if _==1 else ""
+        #console.print(__(thread) + prefix + " {}{}\n".format(palette.BLUE, *objs))
+        if thread == True:
+            console.print('\n')
+        
+        log.info("[bold blue]<tcp://{}:{}>[/bold blue] {}".format(ANODE, APORT, *objs))

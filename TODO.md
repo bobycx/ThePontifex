@@ -7,7 +7,7 @@
 - sigterm handler
 - detect os
 
-- secure with ssl
+- secure with AES w/ RSA
 - registry persistence, maybe a small bat/vbs script too
 - harvest credentials/token grabber
 - updater
