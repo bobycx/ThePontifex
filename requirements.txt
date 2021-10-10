@@ -1,5 +1,2 @@
-prettytable==2.0.0
-pyreadline==2.1      
-tqdm==4.54.1
-wcwidth==0.2.5
 pycryptodome==3.11.0
+rich==10.12.0
