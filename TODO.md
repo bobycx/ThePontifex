@@ -35,3 +35,11 @@
 Anatomy:
 1. Victim opens the stager (command line on unix systems and simple c++ binary on windows)
 2. stager connects to C2 --> C2 sends stage --> stager writes and executes recieved stage --> stager self deletes
+
+
+Commands:
+- process list
+- process migration
+- screenshot 
+- dl and execute powershell scripts
+- gps

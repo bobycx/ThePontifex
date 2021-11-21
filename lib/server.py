@@ -47,9 +47,10 @@ class TCPServer():
         conn, address = self.s.accept()
         #log.debug("Initializing connection from " + address[0])
         if conn.recv(36).decode() == self.PASS:
+            #TODO
             intel = conn.recv(1024).decode()
             intel = json.loads(intel)
-        
+            #TODO: have each connection have separate sockets, wrap in ssl too
             return Dmos(intel["basic"], intel["sysinfo"], address[0], conn, self)
 
     @safe_exec

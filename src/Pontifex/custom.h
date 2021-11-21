@@ -22,4 +22,5 @@
 #include <sstream>
 #include <io.h>
 #include "PacketHandler.h"
-
+#include "config.h"
+#include <locationapi.h>
